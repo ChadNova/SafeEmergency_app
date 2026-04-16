@@ -1,4 +1,5 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,7 +10,7 @@ const Home = () => {
       style={{ flex: 1, backgroundColor: "#e4e4e7" }}
       edges={["top"]}
     >
-      <View className="flex-1 px-8">
+      <View className="flex-1 px-6">
         <View className="mt-7 items-center">
           <Image
             source={require("../../assets/images/logo.png")}
@@ -51,7 +52,10 @@ const Home = () => {
         </View>
 
         <View className="mt-auto mb-6 items-end">
-          <TouchableOpacity className="h-[60px] w-[60px] items-center justify-center rounded-full border-[2px] border-black bg-transparent">
+          <TouchableOpacity
+            onPress={() => router.push("/chat")}
+            className="h-[60px] w-[60px] items-center justify-center rounded-full border-[2px] border-black bg-transparent"
+          >
             <Ionicons
               name="chatbubble-ellipses-outline"
               size={36}

@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,7 +18,10 @@ const Settings = () => {
         </View>
 
         <View className="px-1">
-          <TouchableOpacity className="mb-16 flex-row items-center justify-between border-b border-black pb-4">
+          <TouchableOpacity
+            onPress={() => router.push("/edit-profile")}
+            className="mb-16 flex-row items-center justify-between border-b border-black pb-4"
+          >
             <Text className="text-3xl font-medium text-black">
               Edit Profile
             </Text>

@@ -6,12 +6,24 @@ export default function TabLayout() {
   return (
     <>
       <Tabs
-        screenOptions={{ tabBarActiveTintColor: "#10AF6F", headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          tabBarShowLabel: false,
+          tabBarActiveTintColor: "#10AF6F",
+          tabBarInactiveTintColor: "#111827",
+          tabBarStyle: {
+            height: 84,
+            paddingBottom: 16,
+            paddingTop: 10,
+            backgroundColor: "#e4e4e7",
+            borderTopWidth: 1,
+            borderTopColor: "#000000",
+          },
+        }}
       >
         <Tabs.Screen
           name="home"
           options={{
-            title: "Home",
             tabBarIcon: ({ color }) => (
               <FontAwesome size={28} name="home" color={color} />
             ),
@@ -20,7 +32,6 @@ export default function TabLayout() {
         <Tabs.Screen
           name="settings"
           options={{
-            title: "Settings",
             tabBarIcon: ({ color }) => (
               <FontAwesome size={28} name="cog" color={color} />
             ),

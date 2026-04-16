@@ -48,3 +48,51 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# SafeEmergency App ✳️
+
+SafeEmergency is a high-performance React Native mobile application designed for real-time emergency assistance. This project focuses on rapid response through an intuitive UI, featuring voice-mode situation description and secure user authentication.
+
+## 🚀 Project Status: Core Navigation & UI Complete
+The foundational architecture is now fully implemented using **Expo Router** (File-based routing) and a professional **Atomic Design** structure.
+
+### ✅ Implemented Features
+* **Authentication Flow:** Fully functional navigation between Landing, Sign Up, and Login.
+* **Modern UI/UX:** Styled according to Figma specifications using the Emerald Green (#10B981) theme.
+* **Voice Mode Interface:** Interactive Home Screen with a centered microphone UI for emergency reporting.
+* **Safe Navigation:** Integrated `react-native-safe-area-context` to ensure UI compatibility across all mobile notches and status bars.
+
+
+
+## 📂 Project Structure
+To keep the code clean and scalable, I have implemented a dual-layer structure:
+
+* **`app/`**: Handles the routing logic. This is where the app's "pages" are defined.
+* **`src/screens/`**: Contains the design and business logic for every screen.
+* **`src/theme/`**: Centralized styling constants (Colors, Font sizes) to ensure design consistency.
+* **`components/`**: Reusable UI elements like buttons and input fields.
+
+## 🛠️ Tech Stack
+* **Framework:** React Native (Expo)
+* **Router:** Expo Router (v3+)
+* **Icons:** Expo Vector Icons (Ionicons, FontAwesome)
+* **Language:** JavaScript / TypeScript
+
+## ⚙️ How to Run
+If you are a team member pulling this repo for the first time:
+
+1.  **Clone the repo:**
+    ```bash
+    git clone [your-repo-link]
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Start the development server:**
+    ```bash
+    npx expo start -c
+    ```
+4.  Open the **Expo Go** app on your phone and scan the QR code.
+
+---
+*Developed as part of the Data Science Final Year Project at Kigali Independent University (ULK).*

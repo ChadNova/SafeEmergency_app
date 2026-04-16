@@ -1,6 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
+import {
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -22,13 +28,13 @@ export default function SignUpScreen() {
           <TextInput style={styles.input} secureTextEntry={true} />
         </View>
 
-        <TouchableOpacity onPress={() => router.push('/login')}>
-          <Text style={styles.linkText}>have an Account</Text>
+        <TouchableOpacity onPress={() => router.push("/login")}>
+          <Text style={styles.linkText}>have an Account? Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => router.push('/home')}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/(tabs)/home")}
         >
           <Text style={styles.buttonText}>Sign up</Text>
         </TouchableOpacity>
@@ -38,14 +44,36 @@ export default function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
-  content: { flex: 1, padding: 30, justifyContent: 'center', alignItems: 'center' },
-  logo: { fontSize: 60, color: '#10B981', marginBottom: 10 },
-  header: { fontSize: 28, fontWeight: 'bold', marginBottom: 40 },
-  inputGroup: { width: '100%' },
-  label: { fontSize: 14, color: '#374151', marginBottom: 5 },
-  input: { borderBottomWidth: 1, borderBottomColor: '#D1D5DB', paddingVertical: 10, marginBottom: 25, fontSize: 16 },
-  linkText: { color: '#10B981', alignSelf: 'flex-end', marginBottom: 30, fontWeight: '600' },
-  button: { backgroundColor: '#10B981', width: '100%', padding: 18, borderRadius: 35, alignItems: 'center' },
-  buttonText: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }
+  container: { flex: 1, backgroundColor: "#FFFFFF" },
+  content: {
+    flex: 1,
+    padding: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logo: { fontSize: 60, color: "#10B981", marginBottom: 10 },
+  header: { fontSize: 28, fontWeight: "bold", marginBottom: 40 },
+  inputGroup: { width: "100%" },
+  label: { fontSize: 14, color: "#374151", marginBottom: 5 },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#D1D5DB",
+    paddingVertical: 10,
+    marginBottom: 25,
+    fontSize: 16,
+  },
+  linkText: {
+    color: "#10B981",
+    alignSelf: "flex-end",
+    marginBottom: 30,
+    fontWeight: "600",
+  },
+  button: {
+    backgroundColor: "#10B981",
+    width: "100%",
+    padding: 18,
+    borderRadius: 35,
+    alignItems: "center",
+  },
+  buttonText: { color: "#FFFFFF", fontSize: 18, fontWeight: "bold" },
 });

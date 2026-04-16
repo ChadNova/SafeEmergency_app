@@ -1,11 +1,6 @@
 import { useRouter } from "expo-router"; // <--- PASTE 1: The Import
-import {
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LandingScreen() {
   const router = useRouter(); // <--- PASTE 2: The Hook

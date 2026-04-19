@@ -1,9 +1,4 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import express from "express";
-import multer from "multer";
-
-const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY, {
   apiVersion: "v1beta",
@@ -33,17 +28,7 @@ Output format:
 }
 `;
 
-/**
- * @swagger
- * /classify:
- *   post:
- *     summary: Classify an emergency situation from text or audio
- *     description: Analyzes either the provided text or an uploaded audio file and classifies it into one of the known emergency categories.
- *     responses:
- *       200:
- *         description: Successful classification
- */
-router.post("/", upload.single("audio"), async (req, res) => {
+export const classifyEmergency = async (req, res) => {
   const { text } = req.body;
   const audioFile = req.file;
 
@@ -58,7 +43,6 @@ router.post("/", upload.single("audio"), async (req, res) => {
 
     let result;
     if (audioFile) {
-      // Processing audio with Gemini Pro 1.5 Flash
       result = await model.generateContent([
         SYSTEM_PROMPT,
         {
@@ -70,7 +54,6 @@ router.post("/", upload.single("audio"), async (req, res) => {
         "Analyze this emergency audio and identify the intent.",
       ]);
     } else {
-      // Processing text
       result = await model.generateContent(
         SYSTEM_PROMPT + "\n\nInput: " + text,
       );
@@ -79,7 +62,7 @@ router.post("/", upload.single("audio"), async (req, res) => {
     const response = await result.response;
     const aiText = response.text();
 
-    // Extract JSON from potential Markdown formatting
+    // Extract JSON from potential Markdown formatting.
     const cleanedText = aiText.replace(/```json|```/g, "").trim();
 
     let parsed;
@@ -101,6 +84,4 @@ router.post("/", upload.single("audio"), async (req, res) => {
       error: error.message,
     });
   }
-});
-
-export default router;
+};

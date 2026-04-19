@@ -1,7 +1,7 @@
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
-import classifyRoute from "./routes/classify.js";
+import classifyRoute from "./routes/classifyRoute.js";
 import authRoute from "./routes/userAuth.js";
 import setupSwagger from "./swagger.js";
 

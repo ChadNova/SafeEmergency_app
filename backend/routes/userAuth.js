@@ -28,6 +28,20 @@ const verifyToken = (req, res, next) => {
  * /auth/register:
  *   post:
  *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RegisterRequest'
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Validation error or user already exists
+ *       500:
+ *         description: Server error
  */
 router.post("/register", async (req, res) => {
   try {
@@ -80,6 +94,20 @@ router.post("/register", async (req, res) => {
  * /auth/login:
  *   post:
  *     summary: Login an existing user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       400:
+ *         description: Invalid credentials or missing fields
+ *       500:
+ *         description: Server error
  */
 router.post("/login", async (req, res) => {
   try {
@@ -120,6 +148,18 @@ router.post("/login", async (req, res) => {
  * /auth/me:
  *   get:
  *     summary: Get current authenticated user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current authenticated user
+ *       401:
+ *         description: Missing token
+ *       400:
+ *         description: Invalid token
+ *       500:
+ *         description: Server error
  */
 router.get("/me", verifyToken, async (req, res) => {
   try {

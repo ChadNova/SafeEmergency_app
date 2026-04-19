@@ -1,6 +1,7 @@
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import classifyRoute from "./routes/classify.js";
 import authRoute from "./routes/userAuth.js";
 import setupSwagger from "./swagger.js";
 
@@ -16,6 +17,9 @@ connectDB();
 
 // Routes
 app.use("/auth", authRoute);
+app.use("/classify", classifyRoute);
+
+// Swagger
 setupSwagger(app);
 
 // Start the server

@@ -3,8 +3,14 @@ import { router } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { clearAuthToken } from "../../constants/auth";
 
 const Settings = () => {
+  const handleLogout = async () => {
+    await clearAuthToken();
+    router.replace("/");
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-zinc-200 px-5 pt-10">
       <View className="flex-1">
@@ -37,7 +43,10 @@ const Settings = () => {
         </View>
       </View>
 
-      <TouchableOpacity className="mb-8 self-center rounded-full bg-[#10AF6F] px-36 py-4">
+      <TouchableOpacity
+        onPress={handleLogout}
+        className="mb-8 self-center rounded-full bg-[#10AF6F] px-36 py-4"
+      >
         <Text className="text-3xl font-bold text-white">Logout</Text>
       </TouchableOpacity>
     </SafeAreaView>

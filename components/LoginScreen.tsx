@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { API_BASE_URL } from "../constants/api";
+import { saveAuthToken } from "../constants/auth";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -45,6 +46,10 @@ export default function LoginScreen() {
       if (!response.ok) {
         setErrorMessage(data?.error ?? "Login failed");
         return;
+      }
+
+      if (data?.token) {
+        await saveAuthToken(data.token);
       }
 
       router.replace("/(tabs)/home");

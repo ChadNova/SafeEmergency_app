@@ -9,8 +9,10 @@ import { protocolSteps, type ProtocolId } from "../constants/protocols";
 const fallbackProtocol: ProtocolId = "unconscious";
 
 export default function GuidanceScreen() {
-  const params = useLocalSearchParams<{ protocol?: string }>();
-  const protocol = (params.protocol as ProtocolId) || fallbackProtocol;
+  const params = useLocalSearchParams<{ protocol?: string; protocolId?: string; summary?: string }>();
+  // Use either protocol or protocolId depending on how it was passed
+  const rawProtocol = params.protocol || params.protocolId;
+  const protocol = (rawProtocol as ProtocolId) || fallbackProtocol;
   const steps = protocolSteps[protocol] || protocolSteps[fallbackProtocol];
   const [stepIndex, setStepIndex] = React.useState(0);
 
@@ -18,6 +20,12 @@ export default function GuidanceScreen() {
 
   React.useEffect(() => {
     Speech.stop();
+    
+    // Only speak the AI summary if it exists and we're starting step 1
+    if (stepIndex === 0 && params.summary) {
+      Speech.speak(params.summary, { rate: 0.95, pitch: 1, language: "en-US" });
+    }
+
     Speech.speak(currentStep.title, {
       rate: 0.95,
       pitch: 1,
@@ -27,7 +35,7 @@ export default function GuidanceScreen() {
     return () => {
       Speech.stop();
     };
-  }, [currentStep.title]);
+  }, [currentStep.title, params.summary, stepIndex]);
 
   const handleNext = () => {
     if (stepIndex < steps.length - 1) {

@@ -1,8 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY, {
-  apiVersion: "v1beta",
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+
+const ALLOWED_INTENTS = new Set([
+  "cardiac_arrest",
+  "bleeding",
+  "unconscious",
+  "choking",
+  "unknown",
+]);
 
 const SYSTEM_PROMPT = `
 You are an emergency classification assistant.
@@ -13,6 +19,7 @@ Your ONLY task is to classify the situation into one of the following categories
 - cardiac_arrest
 - bleeding
 - unconscious
+- choking
 - unknown
 
 Rules:
@@ -38,7 +45,10 @@ export const classifyEmergency = async (req, res) => {
 
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-robotics-er-1.5-preview",
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
     });
 
     let result;
@@ -60,20 +70,29 @@ export const classifyEmergency = async (req, res) => {
     }
 
     const response = await result.response;
-    const aiText = response.text();
-
-    // Extract JSON from potential Markdown formatting.
-    const cleanedText = aiText.replace(/```json|```/g, "").trim();
+    const aiText = response
+      .text()
+      .replace(/```json|```/g, "")
+      .trim();
 
     let parsed;
     try {
-      parsed = JSON.parse(cleanedText);
+      parsed = JSON.parse(aiText);
     } catch {
       parsed = {
         intent: "unknown",
         confidence: 0.3,
       };
     }
+
+    if (!ALLOWED_INTENTS.has(parsed.intent)) {
+      parsed.intent = "unknown";
+    }
+
+    const confidence = Number(parsed.confidence);
+    parsed.confidence = Number.isFinite(confidence)
+      ? Math.max(0, Math.min(1, confidence))
+      : 0.3;
 
     return res.json(parsed);
   } catch (error) {

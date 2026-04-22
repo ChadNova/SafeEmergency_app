@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { triageQuestions, type ProtocolId } from "../constants/protocols";
 
 type Sender = "ai" | "user";
 
@@ -12,37 +13,21 @@ type Message = {
   sender: Sender;
 };
 
-const triggerQuestions = [
-  {
-    question: "Are you in immediate danger?",
-    yes: "Move to a safe place now and call emergency services.",
-    no: "Okay. Is someone else with you right now?",
-  },
-  {
-    question: "Is someone else with you right now?",
-    yes: "Stay together and share your exact location.",
-    no: "Keep your phone ready and tell me if you need medical help.",
-  },
-  {
-    question: "Do you need medical help?",
-    yes: "Please call local emergency services immediately.",
-    no: "Understood. I will keep guiding you step by step.",
-  },
-];
-
-const Chat = () => {
+export default function Chat() {
   const [step, setStep] = React.useState(0);
+  const [answers, setAnswers] = React.useState<Array<"yes" | "no">>([]);
   const [messages, setMessages] = React.useState<Message[]>([
     {
       id: "ai-0",
-      text: triggerQuestions[0].question,
+      text: triageQuestions[0].question,
       sender: "ai",
     },
   ]);
 
   const handleAnswer = (answer: "yes" | "no") => {
-    const currentQuestion = triggerQuestions[step];
+    const currentQuestion = triageQuestions[step];
     const responseText = currentQuestion[answer];
+    const nextAnswers = [...answers, answer];
 
     const nextMessages: Message[] = [
       ...messages,
@@ -60,94 +45,148 @@ const Chat = () => {
 
     const nextStep = step + 1;
 
-    if (nextStep < triggerQuestions.length) {
+    if (nextStep < triageQuestions.length) {
       nextMessages.push({
         id: `ai-question-${nextStep}`,
-        text: triggerQuestions[nextStep].question,
+        text: triageQuestions[nextStep].question,
         sender: "ai",
       });
     } else {
+      const protocol: ProtocolId =
+        nextAnswers[0] === "no"
+          ? nextAnswers[1] === "no"
+            ? "cardiac_arrest"
+            : "unconscious"
+          : nextAnswers[2] === "yes"
+            ? "bleeding"
+            : "unconscious";
+
       nextMessages.push({
         id: "ai-complete",
-        text: "Thank you. If the situation changes, tell me immediately.",
+        text: "Triage complete. Opening the guidance screen now.",
         sender: "ai",
       });
+      setTimeout(() => {
+        router.replace({
+          pathname: "/guidance",
+          params: { protocol },
+        });
+      }, 700);
     }
 
     setStep(nextStep);
+    setAnswers(nextAnswers);
     setMessages(nextMessages);
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#e4e4e7]">
-      <View className="flex-1 px-5 pt-4">
-        <View className="mb-6 flex-row items-center justify-between px-1">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="h-11 w-11 items-center justify-center rounded-full bg-black/5"
-          >
-            <Ionicons name="chevron-back" size={26} color="#111827" />
-          </TouchableOpacity>
-
-          <View className="items-center">
-            <Image
-              source={require("../assets/images/logo.png")}
-              className="h-12 w-12"
-              resizeMode="contain"
-            />
-            <Text className="mt-1 text-lg font-bold text-black">Chat</Text>
-          </View>
-
-          <View className="h-11 w-11" />
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 px-5 pt-2">
+        <View className="items-center pt-3">
+          <Image
+            source={require("../assets/images/logo.png")}
+            className="h-16 w-16"
+            resizeMode="contain"
+          />
+          <Text className="mt-1 text-[22px] font-semibold text-black">
+            SafeEmergency
+          </Text>
         </View>
 
-        <ScrollView
-          className="flex-1"
-          contentContainerClassName="gap-4 pb-6"
-          showsVerticalScrollIndicator={false}
-        >
-          {messages.map((message) => {
-            const isUser = message.sender === "user";
+        <View className="mt-10 flex-1 rounded-[54px] bg-[#def2ea] px-5 py-6">
+          <ScrollView
+            className="flex-1"
+            contentContainerClassName="gap-7 pb-6"
+            showsVerticalScrollIndicator={false}
+          >
+            {messages.map((message) => {
+              const isUser = message.sender === "user";
 
-            return (
-              <View
-                key={message.id}
-                className={`max-w-[84%] rounded-3xl px-4 py-3 ${
-                  isUser
-                    ? "self-end rounded-br-md bg-[#10AF6F]"
-                    : "self-start rounded-bl-md bg-white"
-                }`}
-              >
-                <Text
-                  className={`text-[16px] leading-6 ${
-                    isUser ? "text-white" : "text-black"
+              return (
+                <View
+                  key={message.id}
+                  className={`flex-row items-start gap-3 ${
+                    isUser ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.text}
-                </Text>
-              </View>
-            );
-          })}
-        </ScrollView>
+                  {!isUser ? (
+                    <View className="mt-3 h-5 w-5 rounded-full border border-zinc-700 bg-transparent" />
+                  ) : (
+                    <View className="h-5 w-5" />
+                  )}
 
-        <View className="mb-5 flex-row gap-4">
+                  {isUser ? (
+                    <View className="max-w-[68%] rounded-full bg-white px-6 py-4">
+                      <Text className="text-[16px] font-medium text-zinc-500">
+                        {message.text}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View
+                      className={`max-w-[68%] rounded-full bg-white/65 px-6 py-4 ${
+                        message.text.length > 34 ? "py-5" : "py-4"
+                      }`}
+                    >
+                      <Text className="text-[16px] font-medium text-zinc-500">
+                        {message.text}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+
+            <View className="pt-2">
+              <View className="ml-7 max-w-[68%] rounded-[38px] bg-white/70 px-6 py-5">
+                <Text className="mb-4 text-[14px] font-semibold text-zinc-500">
+                  {
+                    triageQuestions[Math.min(step, triageQuestions.length - 1)]
+                      .question
+                  }
+                </Text>
+                <View className="gap-3">
+                  <TouchableOpacity
+                    onPress={() => handleAnswer("yes")}
+                    className="self-end rounded-full bg-white px-7 py-3 shadow-sm shadow-black/5"
+                  >
+                    <Text className="text-[16px] font-medium text-zinc-500">
+                      Yes
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleAnswer("no")}
+                    className="self-end rounded-full bg-white px-7 py-3 shadow-sm shadow-black/5"
+                  >
+                    <Text className="text-[16px] font-medium text-zinc-500">
+                      No
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+
+        <View className="absolute bottom-24 right-4 items-end">
           <TouchableOpacity
-            onPress={() => handleAnswer("yes")}
-            className="flex-1 items-center justify-center rounded-full bg-[#10AF6F] py-4"
+            onPress={() => router.back()}
+            className="mb-2 h-14 w-14 items-center justify-center rounded-full border-2 border-black bg-white"
           >
-            <Text className="text-xl font-bold text-white">Yes</Text>
+            <Text className="text-2xl font-bold text-black">=</Text>
+          </TouchableOpacity>
+          <Ionicons name="arrow-up" size={26} color="#111827" />
+        </View>
+
+        <View className="mt-6 flex-row items-center justify-around pb-4">
+          <TouchableOpacity onPress={() => router.replace("/(tabs)/home")}>
+            <Ionicons name="home" size={34} color="#000000" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => handleAnswer("no")}
-            className="flex-1 items-center justify-center rounded-full bg-black py-4"
-          >
-            <Text className="text-xl font-bold text-white">No</Text>
+          <TouchableOpacity onPress={() => router.replace("/(tabs)/settings")}>
+            <Ionicons name="settings-outline" size={34} color="#000000" />
           </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
   );
-};
-
-export default Chat;
+}

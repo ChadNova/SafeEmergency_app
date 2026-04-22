@@ -35,7 +35,10 @@ const Home = () => {
               <View className="h-9 w-[6px] rounded-full bg-[#10AF6F]" />
             </View>
 
-            <TouchableOpacity className="h-36 w-36 items-center justify-center rounded-[22px] border-[3px] border-emerald-950 bg-emerald-600">
+            <TouchableOpacity
+              onPress={() => router.push("/chat")}
+              className="h-36 w-36 items-center justify-center rounded-[22px] border-[3px] border-emerald-950 bg-emerald-600"
+            >
               <View className="h-28 w-28 items-center justify-center rounded-[18px] border-[3px] border-emerald-700 bg-emerald-600">
                 <View className="h-[70px] w-[70px] items-center justify-center rounded-[18px] border-[4px] border-emerald-600 bg-zinc-100">
                   <FontAwesome name="microphone" size={22} color="#B91C1C" />

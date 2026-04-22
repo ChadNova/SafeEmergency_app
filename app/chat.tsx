@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { triageQuestions, type ProtocolId } from "../constants/protocols";
+import { type ProtocolId } from "../constants/protocols";
 
 type Sender = "ai" | "user";
 
@@ -13,21 +13,39 @@ type Message = {
   sender: Sender;
 };
 
+type TriageStep = "Q1" | "Q2" | "Q3";
+
+const questions = {
+  Q1: {
+    question: "Is the person conscious?",
+    yesReply: "Okay, checking for bleeding now.",
+    noReply: "Okay, they are unconscious. Checking breathing now.",
+  },
+  Q2: {
+    question: "Is the person breathing?",
+    yesReply: "Understood. The person is breathing but unconscious.",
+    noReply: "Understood. The person is NOT breathing.",
+  },
+  Q3: {
+    question: "Is there heavy bleeding?",
+    yesReply: "Understood. Severe bleeding detected.",
+    noReply: "Understood. No heavy bleeding detected.",
+  },
+} as const;
+
 export default function Chat() {
-  const [step, setStep] = React.useState(0);
-  const [answers, setAnswers] = React.useState<Array<"yes" | "no">>([]);
+  const [step, setStep] = React.useState<TriageStep>("Q1");
   const [messages, setMessages] = React.useState<Message[]>([
     {
       id: "ai-0",
-      text: triageQuestions[0].question,
+      text: questions["Q1"].question,
       sender: "ai",
     },
   ]);
 
   const handleAnswer = (answer: "yes" | "no") => {
-    const currentQuestion = triageQuestions[step];
-    const responseText = currentQuestion[answer];
-    const nextAnswers = [...answers, answer];
+    const currentQuestion = questions[step];
+    const responseText = answer === "yes" ? currentQuestion.yesReply : currentQuestion.noReply;
 
     const nextMessages: Message[] = [
       ...messages,
@@ -43,39 +61,52 @@ export default function Chat() {
       },
     ];
 
-    const nextStep = step + 1;
+    let nextStep: TriageStep | null = null;
+    let protocol: ProtocolId | "unknown" | null = null;
 
-    if (nextStep < triageQuestions.length) {
-      nextMessages.push({
-        id: `ai-question-${nextStep}`,
-        text: triageQuestions[nextStep].question,
-        sender: "ai",
-      });
-    } else {
-      const protocol: ProtocolId =
-        nextAnswers[0] === "no"
-          ? nextAnswers[1] === "no"
-            ? "cardiac_arrest"
-            : "unconscious"
-          : nextAnswers[2] === "yes"
-            ? "bleeding"
-            : "unconscious";
-
-      nextMessages.push({
-        id: "ai-complete",
-        text: "Triage complete. Opening the guidance screen now.",
-        sender: "ai",
-      });
-      setTimeout(() => {
-        router.replace({
-          pathname: "/guidance",
-          params: { protocol },
-        });
-      }, 700);
+    if (step === "Q1") {
+      if (answer === "no") nextStep = "Q2";
+      if (answer === "yes") nextStep = "Q3";
+    } else if (step === "Q2") {
+      if (answer === "no") protocol = "cardiac_arrest";
+      if (answer === "yes") protocol = "unconscious";
+    } else if (step === "Q3") {
+      if (answer === "yes") protocol = "bleeding";
+      if (answer === "no") protocol = "unknown";
     }
 
-    setStep(nextStep);
-    setAnswers(nextAnswers);
+    if (nextStep) {
+      nextMessages.push({
+        id: `ai-question-${nextStep}`,
+        text: questions[nextStep].question,
+        sender: "ai",
+      });
+      setStep(nextStep);
+    } else if (protocol) {
+      if (protocol === "unknown") {
+        nextMessages.push({
+          id: "ai-complete",
+          text: "No immediate life-threatening emergency identified. Returning to general help.",
+          sender: "ai",
+        });
+        setTimeout(() => {
+          router.replace("/");
+        }, 1500);
+      } else {
+        nextMessages.push({
+          id: "ai-complete",
+          text: "Triage complete. Opening the emergency protocol now.",
+          sender: "ai",
+        });
+        setTimeout(() => {
+          router.replace({
+            pathname: "/guidance",
+            params: { protocolId: protocol },
+          });
+        }, 1000);
+      }
+    }
+
     setMessages(nextMessages);
   };
 
@@ -139,10 +170,7 @@ export default function Chat() {
             <View className="pt-2">
               <View className="ml-7 max-w-[68%] rounded-[38px] bg-white/70 px-6 py-5">
                 <Text className="mb-4 text-[14px] font-semibold text-zinc-500">
-                  {
-                    triageQuestions[Math.min(step, triageQuestions.length - 1)]
-                      .question
-                  }
+                  {questions[step]?.question || "Processing..."}
                 </Text>
                 <View className="gap-3">
                   <TouchableOpacity

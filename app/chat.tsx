@@ -136,9 +136,8 @@ export default function Chat() {
               return (
                 <View
                   key={message.id}
-                  className={`flex-row items-start gap-3 ${
-                    isUser ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex-row items-start gap-3 ${isUser ? "justify-end" : "justify-start"
+                    }`}
                 >
                   {!isUser ? (
                     <View className="mt-3 h-5 w-5 rounded-full border border-zinc-700 bg-transparent" />
@@ -154,9 +153,8 @@ export default function Chat() {
                     </View>
                   ) : (
                     <View
-                      className={`max-w-[68%] rounded-full bg-white/65 px-6 py-4 ${
-                        message.text.length > 34 ? "py-5" : "py-4"
-                      }`}
+                      className={`max-w-[68%] rounded-full bg-white/65 px-6 py-4 ${message.text.length > 34 ? "py-5" : "py-4"
+                        }`}
                     >
                       <Text className="text-[16px] font-medium text-zinc-500">
                         {message.text}
@@ -193,16 +191,6 @@ export default function Chat() {
               </View>
             </View>
           </ScrollView>
-        </View>
-
-        <View className="absolute bottom-24 right-4 items-end">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="mb-2 h-14 w-14 items-center justify-center rounded-full border-2 border-black bg-white"
-          >
-            <Text className="text-2xl font-bold text-black">=</Text>
-          </TouchableOpacity>
-          <Ionicons name="arrow-up" size={26} color="#111827" />
         </View>
 
         <View className="mt-6 flex-row items-center justify-around pb-4">

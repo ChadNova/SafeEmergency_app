@@ -8,7 +8,6 @@
  */
 
 import {
-  AntDesign,
   Feather,
   FontAwesome5,
   MaterialIcons,
@@ -31,7 +30,21 @@ import Reanimated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { PlaybackState, SavedRecording } from "../hooks/useVoiceRecorder";
+export interface SavedRecording {
+  id: string;
+  name: string;
+  uri: string;
+  createdAt: string;
+  duration: number;
+}
+
+export interface PlaybackState {
+  isPlaying: boolean;
+  isBuffering: boolean;
+  isLoaded: boolean;
+  currentTime: number;
+  duration?: number;
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

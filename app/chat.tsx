@@ -45,7 +45,8 @@ export default function Chat() {
 
   const handleAnswer = (answer: "yes" | "no") => {
     const currentQuestion = questions[step];
-    const responseText = answer === "yes" ? currentQuestion.yesReply : currentQuestion.noReply;
+    const responseText =
+      answer === "yes" ? currentQuestion.yesReply : currentQuestion.noReply;
 
     const nextMessages: Message[] = [
       ...messages,
@@ -122,12 +123,13 @@ export default function Chat() {
           <Text className="mt-1 text-[22px] font-semibold text-black">
             SafeEmergency
           </Text>
+          <Text className="mt-1 text-sm text-zinc-500">Guided triage chat</Text>
         </View>
 
-        <View className="mt-10 flex-1 rounded-[54px] bg-[#def2ea] px-5 py-6">
+        <View className="mt-8 flex-1 rounded-[54px] bg-[#def2ea] px-5 py-6 shadow-2xl shadow-emerald-950/10">
           <ScrollView
             className="flex-1"
-            contentContainerClassName="gap-7 pb-6"
+            contentContainerClassName="gap-6 pb-6"
             showsVerticalScrollIndicator={false}
           >
             {messages.map((message) => {
@@ -136,8 +138,9 @@ export default function Chat() {
               return (
                 <View
                   key={message.id}
-                  className={`flex-row items-start gap-3 ${isUser ? "justify-end" : "justify-start"
-                    }`}
+                  className={`flex-row items-start gap-3 ${
+                    isUser ? "justify-end" : "justify-start"
+                  }`}
                 >
                   {!isUser ? (
                     <View className="mt-3 h-5 w-5 rounded-full border border-zinc-700 bg-transparent" />
@@ -153,8 +156,9 @@ export default function Chat() {
                     </View>
                   ) : (
                     <View
-                      className={`max-w-[68%] rounded-full bg-white/65 px-6 py-4 ${message.text.length > 34 ? "py-5" : "py-4"
-                        }`}
+                      className={`max-w-[68%] rounded-full bg-white/65 px-6 py-4 ${
+                        message.text.length > 34 ? "py-5" : "py-4"
+                      }`}
                     >
                       <Text className="text-[16px] font-medium text-zinc-500">
                         {message.text}
@@ -166,24 +170,36 @@ export default function Chat() {
             })}
 
             <View className="pt-2">
-              <View className="ml-7 max-w-[68%] rounded-[38px] bg-white/70 px-6 py-5">
-                <Text className="mb-4 text-[14px] font-semibold text-zinc-500">
-                  {questions[step]?.question || "Processing..."}
-                </Text>
+              <View className="rounded-[34px] border border-white/70 bg-white/75 px-5 py-5">
+                <View className="mb-4 flex-row items-center justify-between">
+                  <Text className="text-xs font-bold uppercase tracking-[0.24em] text-zinc-500">
+                    Response
+                  </Text>
+                  <Text className="text-xs font-medium text-zinc-400">
+                    One tap answers
+                  </Text>
+                </View>
+
                 <View className="gap-3">
                   <TouchableOpacity
                     onPress={() => handleAnswer("yes")}
-                    className="self-end rounded-full bg-white px-7 py-3 shadow-sm shadow-black/5"
+                    className="flex-row items-center justify-center rounded-full bg-emerald-600 px-7 py-4 shadow-sm shadow-emerald-900/15"
                   >
-                    <Text className="text-[16px] font-medium text-zinc-500">
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={18}
+                      color="#ffffff"
+                    />
+                    <Text className="ml-2 text-[16px] font-semibold text-white">
                       Yes
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => handleAnswer("no")}
-                    className="self-end rounded-full bg-white px-7 py-3 shadow-sm shadow-black/5"
+                    className="flex-row items-center justify-center rounded-full bg-rose-600 px-7 py-4 shadow-sm shadow-rose-900/15"
                   >
-                    <Text className="text-[16px] font-medium text-zinc-500">
+                    <Ionicons name="close-circle" size={18} color="#ffffff" />
+                    <Text className="ml-2 text-[16px] font-semibold text-white">
                       No
                     </Text>
                   </TouchableOpacity>

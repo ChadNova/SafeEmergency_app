@@ -13,7 +13,7 @@ type Message = {
   sender: Sender;
 };
 
-type TriageStep = "Q1" | "Q2" | "Q3";
+type TriageStep = "Q1" | "Q2" | "Q3" | "Q4";
 
 const questions = {
   Q1: {
@@ -30,6 +30,11 @@ const questions = {
     question: "Is there heavy bleeding?",
     yesReply: "Understood. Severe bleeding detected.",
     noReply: "Understood. No heavy bleeding detected.",
+  },
+  Q4: {
+    question: "Are they having a seizure or shaking uncontrollably?",
+    yesReply: "Understood. Seizure symptoms detected.",
+    noReply: "Understood. No seizure symptoms detected.",
   },
 } as const;
 
@@ -73,6 +78,9 @@ export default function Chat() {
       if (answer === "yes") protocol = "unconscious";
     } else if (step === "Q3") {
       if (answer === "yes") protocol = "bleeding";
+      if (answer === "no") nextStep = "Q4";
+    } else if (step === "Q4") {
+      if (answer === "yes") protocol = "epilepsy";
       if (answer === "no") protocol = "unknown";
     }
 

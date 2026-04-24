@@ -2,6 +2,7 @@ export type ProtocolId =
   | "cardiac_arrest"
   | "bleeding"
   | "unconscious"
+  | "epilepsy"
   | "choking";
 
 export type ProtocolStep = {
@@ -56,6 +57,23 @@ export const protocolSteps: Record<ProtocolId, ProtocolStep[]> = {
       title: "Call emergency services",
       description:
         "If they are not breathing normally, call emergency services now.",
+    },
+  ],
+  epilepsy: [
+    {
+      title: "Stay calm and time the seizure",
+      description:
+        "Check the clock and note how long the seizure lasts so you can tell responders.",
+    },
+    {
+      title: "Protect the person from injury",
+      description:
+        "Move hard objects away, cushion the head, and loosen tight clothing around the neck.",
+    },
+    {
+      title: "Call emergency services if needed",
+      description:
+        "Call right away if the seizure lasts more than 5 minutes, repeats, or the person is injured or not waking up.",
     },
   ],
   choking: [

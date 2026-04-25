@@ -1,7 +1,14 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import React from "react";
-import { Image, ScrollView, Switch, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { clearAuthToken } from "../../constants/auth";
 
@@ -36,7 +43,9 @@ const SettingRow = ({
         <Text className="mt-1 text-xs text-[#507264]">{subtitle}</Text>
       </View>
 
-      {rightElement ?? <Ionicons name="chevron-forward" size={19} color="#0e8f5e" />}
+      {rightElement ?? (
+        <Ionicons name="chevron-forward" size={19} color="#0e8f5e" />
+      )}
     </TouchableOpacity>
   );
 };
@@ -57,7 +66,11 @@ const Settings = () => {
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 36 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 20,
+          paddingBottom: 36,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <View className="mb-7 flex-row items-center justify-between">
@@ -65,7 +78,9 @@ const Settings = () => {
             <Text className="text-xs font-semibold uppercase tracking-[2px] text-[#3d6956]">
               SafeEmergency
             </Text>
-            <Text className="mt-2 text-4xl font-black text-[#0f271a]">Settings</Text>
+            <Text className="mt-2 text-4xl font-black text-[#0f271a]">
+              Settings
+            </Text>
             <Text className="mt-1 text-sm text-[#4f7363]">
               Personalize your emergency experience
             </Text>

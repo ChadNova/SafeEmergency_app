@@ -4,16 +4,16 @@ import * as Speech from "expo-speech";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
-    ActivityIndicator,
-    Image,
-    Linking,
-    Pressable,
-    ScrollView,
-    Share,
-    Text,
-    TouchableOpacity,
-    View,
-    useColorScheme,
+  ActivityIndicator,
+  Image,
+  Linking,
+  Pressable,
+  ScrollView,
+  Share,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme,
 } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";

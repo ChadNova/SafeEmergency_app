@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
+import * as Speech from "expo-speech";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
@@ -8,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppSettings } from "../hooks/useAppSettings";
 import { useAppSpeech } from "../hooks/useAppSpeech";
 
-type TriageStep = "Q1" | "Q2" | "Q3";
+type TriageStep = "Q1" | "Q2" | "Q3" | "Q4";
 
 const colors = {
   background: "#e4e4e7",
@@ -41,6 +42,13 @@ const copy = {
         "Is blood heavily pouring out or entirely soaking through their clothes?",
       voice: "Is there severe, heavy bleeding?",
     },
+    Q4: {
+      text: "Is the person having a seizure?",
+      description:
+        "Are they having uncontrolled jerking movements, stiffening, or unresponsiveness?",
+      voice:
+        "Is the person having a seizure? Are they having uncontrolled jerking or are they unresponsive?",
+    },
   },
   yes: "Yes",
   no: "No",
@@ -53,6 +61,7 @@ export default function TriageScreen() {
   const router = useRouter();
   const { haptics, analytics } = useAppSettings();
   const [step, setStep] = useState<TriageStep>("Q1");
+  const [isConscious, setIsConscious] = useState<boolean | null>(null);
   const { speak, stop } = useAppSpeech();
 
   const pulseHaptics = async () => {
@@ -88,8 +97,10 @@ export default function TriageScreen() {
 
     if (step === "Q1") {
       if (answer === "NO") {
+        setIsConscious(false);
         setStep("Q2");
       } else {
+        setIsConscious(true);
         setStep("Q3");
       }
     } else if (step === "Q2") {
@@ -101,12 +112,8 @@ export default function TriageScreen() {
           params: { protocolId: "cardiac_arrest" },
         });
       } else {
-        // Navigate to Unconscious Protocol
-        stop();
-        router.push({
-          pathname: "/guidance",
-          params: { protocolId: "unconscious" },
-        });
+        // Go to Seizure check
+        setStep("Q4");
       }
     } else if (step === "Q3") {
       if (answer === "YES") {
@@ -117,10 +124,32 @@ export default function TriageScreen() {
           params: { protocolId: "bleeding" },
         });
       } else {
-        // Future scope or general help
+        // Go to Seizure check
+        setStep("Q4");
+      }
+    } else if (step === "Q4") {
+      if (answer === "YES") {
+        // Navigate to Epilepsy Protocol
         stop();
-        speak(copy.noThreatSpeech);
-        router.replace("/");
+        router.push({
+          pathname: "/guidance",
+          params: { protocolId: "epilepsy" },
+        });
+      } else {
+        if (isConscious === false) {
+          // Navigate to Unconscious Protocol
+          stop();
+          router.push({
+            pathname: "/guidance",
+            params: { protocolId: "unconscious" },
+          });
+        } else {
+          // No threat
+          stop();
+          Speech.speak(copy.noThreatSpeech, {
+            onDone: () => router.replace("/"),
+          });
+        }
       }
     }
   };
@@ -142,24 +171,15 @@ export default function TriageScreen() {
           <Ionicons name="close" size={28} color={colors.textPrimary} />
         </Pressable>
         <View className="flex-row space-x-2">
-          <View
-            className="h-1.5 w-12 rounded-full"
-            style={{
-              backgroundColor: step === "Q1" ? "#e11d48" : colors.border,
-            }}
-          />
-          <View
-            className="h-1.5 w-12 rounded-full"
-            style={{
-              backgroundColor: step === "Q2" ? "#e11d48" : colors.border,
-            }}
-          />
-          <View
-            className="h-1.5 w-12 rounded-full"
-            style={{
-              backgroundColor: step === "Q3" ? "#e11d48" : colors.border,
-            }}
-          />
+          {(["Q1", "Q2", "Q3", "Q4"] as TriageStep[]).map((s) => (
+            <View
+              key={s}
+              className="h-1.5 w-12 rounded-full"
+              style={{
+                backgroundColor: step === s ? "#e11d48" : colors.border,
+              }}
+            />
+          ))}
         </View>
         <View className="w-10" />
       </View>
@@ -175,8 +195,9 @@ export default function TriageScreen() {
           className="text-xs font-bold uppercase tracking-widest mb-4"
           style={{ color: colors.textSecondary }}
         >
-          {copy.header} {step === "Q1" ? "1" : step === "Q2" ? "2" : "3"}{" "}
-          {copy.of} 3
+          {copy.header}{" "}
+          {(["Q1", "Q2", "Q3", "Q4"] as TriageStep[]).indexOf(step) + 1}{" "}
+          {copy.of} 4
         </Text>
         <Text
           className="text-4xl font-black mb-6 leading-tight"

@@ -330,8 +330,9 @@ export default function GuidanceScreen() {
             {currentStepImage ? (
               <Image
                 source={currentStepImage}
-                className="mb-4 h-48 w-full rounded-2xl"
+                className="mb-4 h-64 w-full rounded-2xl"
                 resizeMode="cover"
+                accessibilityLabel={currentStep.title}
               />
             ) : null}
             <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">

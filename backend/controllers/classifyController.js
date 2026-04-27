@@ -48,7 +48,11 @@ export const classifyEmergency = async (req, res) => {
     return res.status(400).json({ error: "Text or audio file is required" });
   }
 
-  if (audioFile && audioFile.size !== undefined && audioFile.size < MIN_AUDIO_BYTES) {
+  if (
+    audioFile &&
+    audioFile.size !== undefined &&
+    audioFile.size < MIN_AUDIO_BYTES
+  ) {
     return res.json({
       intent: "unknown",
       confidence: 0,
@@ -104,7 +108,10 @@ export const classifyEmergency = async (req, res) => {
     if (!ALLOWED_INTENTS.has(normalizedIntent)) {
       parsed.intent = "unknown";
       parsed.confidence = 0;
-    } else if (!Number.isFinite(normalizedConfidence) || normalizedConfidence < MIN_CONFIDENCE) {
+    } else if (
+      !Number.isFinite(normalizedConfidence) ||
+      normalizedConfidence < MIN_CONFIDENCE
+    ) {
       parsed.intent = "unknown";
       parsed.confidence = Number.isFinite(normalizedConfidence)
         ? normalizedConfidence

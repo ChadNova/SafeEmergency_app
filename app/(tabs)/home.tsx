@@ -10,7 +10,7 @@ import { router, useFocusEffect } from "expo-router";
 import * as Speech from "expo-speech";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
+    Alert,
     Image,
     Modal,
     Pressable,

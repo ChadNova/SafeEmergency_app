@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   ActivityIndicator,
+  Image,
   Linking,
   Pressable,
   ScrollView,
@@ -16,6 +17,7 @@ import {
 } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getGuidanceStepImage } from "../constants/guidanceImages";
 import { protocolSteps, type ProtocolId } from "../constants/protocols";
 
 const fallbackProtocol: ProtocolId = "unconscious";
@@ -94,6 +96,7 @@ export default function GuidanceScreen() {
   const [isFetchingLocation, setIsFetchingLocation] = React.useState(false);
 
   const currentStep = steps[stepIndex];
+  const currentStepImage = getGuidanceStepImage(protocol, stepIndex);
 
   const colors = {
     background: resolvedMode === "dark" ? "#020617" : "#e4e4e7",
@@ -320,6 +323,13 @@ export default function GuidanceScreen() {
 
         <ScrollView className="flex-1" contentContainerClassName="pb-6">
           <View className="rounded-[28px] bg-zinc-100 px-5 py-6">
+            {currentStepImage ? (
+              <Image
+                source={currentStepImage}
+                className="mb-4 h-48 w-full rounded-2xl"
+                resizeMode="cover"
+              />
+            ) : null}
             <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
               Step {stepIndex + 1} of {steps.length}
             </Text>

@@ -1,19 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import * as Speech from "expo-speech";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
-  ActivityIndicator,
-  Image,
-  Linking,
-  Pressable,
-  ScrollView,
-  Share,
-  Text,
-  TouchableOpacity,
-  View,
-  useColorScheme,
+    ActivityIndicator,
+    Image,
+    Linking,
+    Pressable,
+    ScrollView,
+    Share,
+    Text,
+    TouchableOpacity,
+    View,
+    useColorScheme,
 } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -104,28 +104,32 @@ export default function GuidanceScreen() {
     textSecondary: resolvedMode === "dark" ? "#cbd5e1" : "#4b5563",
   };
 
-  React.useEffect(() => {
-    Speech.stop();
-
-    if (isFinished) {
-      return;
-    }
-
-    // Only speak the AI summary if it exists and we're starting step 1
-    if (stepIndex === 0 && params.summary) {
-      Speech.speak(params.summary, { rate: 0.95, pitch: 1, language: "en-US" });
-    }
-
-    Speech.speak(currentStep.title, {
-      rate: 0.95,
-      pitch: 1,
-      language: "en-US",
-    });
-
-    return () => {
+  useFocusEffect(
+    React.useCallback(() => {
       Speech.stop();
-    };
-  }, [currentStep.title, isFinished, params.summary, stepIndex]);
+
+      if (!isFinished) {
+        // Only speak the AI summary if it exists and we're starting step 1
+        if (stepIndex === 0 && params.summary) {
+          Speech.speak(params.summary, {
+            rate: 0.95,
+            pitch: 1,
+            language: "en-US",
+          });
+        }
+
+        Speech.speak(currentStep.title, {
+          rate: 0.95,
+          pitch: 1,
+          language: "en-US",
+        });
+      }
+
+      return () => {
+        Speech.stop();
+      };
+    }, [currentStep.title, isFinished, params.summary, stepIndex]),
+  );
 
   const handlePrevious = () => {
     setStepIndex((value) => Math.max(0, value - 1));

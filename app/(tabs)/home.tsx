@@ -1,27 +1,36 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useState, useEffect, useRef } from "react";
-import { Image, Text, TouchableOpacity, View, Modal, Pressable, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  RecordingPresets,
-  requestRecordingPermissionsAsync,
-  setAudioModeAsync,
-  useAudioRecorder,
+    RecordingPresets,
+    requestRecordingPermissionsAsync,
+    setAudioModeAsync,
+    useAudioRecorder,
 } from "expo-audio";
 import * as Haptics from "expo-haptics";
+import { router, useFocusEffect } from "expo-router";
 import * as Speech from "expo-speech";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Alert,
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import Animated, {
-  Extrapolation,
-  FadeIn,
-  FadeOut,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withRepeat,
-  withTiming,
+    Extrapolation,
+    FadeIn,
+    FadeOut,
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withRepeat,
+    withTiming,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const PulseCircle = ({ delay = 0, color = "bg-emerald-500/20" }) => {
   const pulse = useSharedValue(0);
@@ -71,6 +80,20 @@ const Home = () => {
   const timerRef = useRef<number | null>(null);
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
+  React.useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        Speech.stop();
+      };
+    }, []),
+  );
+
   useEffect(() => {
     setAudioModeAsync({
       allowsRecording: false,
@@ -103,19 +126,30 @@ const Home = () => {
       console.log("AI RESPONSE:", data);
 
       if (data.intent && data.intent !== "unknown") {
+        Speech.stop();
         router.push({
           pathname: "/guidance",
-          params: { 
+          params: {
             protocolId: data.intent,
-            summary: data.summary || `${data.intent.replace("_", " ")} protocol initiated.`
+            summary:
+              data.summary ||
+              `${data.intent.replace("_", " ")} protocol initiated.`,
           },
         });
       } else {
-        Speech.speak("Emergency sequence could not be identified. Please proceed manually.");
-        router.push("/triage");
+        Speech.stop();
+        Speech.speak(
+          "Emergency sequence could not be identified. Please proceed manually.",
+          {
+            onDone: () => {
+              router.push("/triage");
+            },
+          },
+        );
       }
     } catch (error) {
       console.error("ANALYSIS ERROR:", error);
+      Speech.stop();
       router.push("/triage");
     } finally {
       setIsAnalyzing(false);
@@ -157,6 +191,15 @@ const Home = () => {
 
     setIsRecording(false);
     if (timerRef.current) clearInterval(timerRef.current);
+
+    if (timer < 2) {
+      Speech.stop();
+      Alert.alert(
+        "Recording too short",
+        "Please speak for a moment before sending the audio.",
+      );
+      return;
+    }
 
     try {
       await recorder.stop();
@@ -249,9 +292,17 @@ const Home = () => {
       </View>
 
       {/* Fullscreen Recording Modal */}
-      <Modal transparent visible={isRecording || isAnalyzing} animationType="fade">
+      <Modal
+        transparent
+        visible={isRecording || isAnalyzing}
+        animationType="fade"
+      >
         <View className="flex-1 bg-slate-950/95 items-center justify-center">
-          <Animated.View entering={FadeIn} exiting={FadeOut} className="items-center">
+          <Animated.View
+            entering={FadeIn}
+            exiting={FadeOut}
+            className="items-center"
+          >
             <View className="items-center justify-center mb-20">
               <PulseCircle delay={0} color="bg-emerald-500/30" />
               <PulseCircle delay={500} color="bg-emerald-500/20" />
@@ -263,7 +314,7 @@ const Home = () => {
             <Text className="text-white text-4xl font-black mb-4">
               {formatTime(timer)}
             </Text>
-            
+
             <Text className="text-emerald-500 text-xs font-black uppercase tracking-widest mb-12 animate-pulse">
               {isAnalyzing ? "Processing..." : "Listening..."}
             </Text>
@@ -281,7 +332,6 @@ const Home = () => {
           </Animated.View>
         </View>
       </Modal>
-
     </SafeAreaView>
   );
 };

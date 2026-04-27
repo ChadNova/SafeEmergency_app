@@ -4,6 +4,17 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY, {
   apiVersion: "v1beta",
 });
 
+const ALLOWED_INTENTS = new Set([
+  "cardiac_arrest",
+  "bleeding",
+  "unconscious",
+  "epilepsy",
+  "unknown",
+]);
+
+const MIN_AUDIO_BYTES = 4096;
+const MIN_CONFIDENCE = 0.6;
+
 const SYSTEM_PROMPT = `
 You are an emergency classification assistant.
 
@@ -35,6 +46,14 @@ export const classifyEmergency = async (req, res) => {
 
   if (!text && !audioFile) {
     return res.status(400).json({ error: "Text or audio file is required" });
+  }
+
+  if (audioFile && audioFile.size !== undefined && audioFile.size < MIN_AUDIO_BYTES) {
+    return res.json({
+      intent: "unknown",
+      confidence: 0,
+      reason: "audio_too_short",
+    });
   }
 
   try {
@@ -76,6 +95,23 @@ export const classifyEmergency = async (req, res) => {
         intent: "unknown",
         confidence: 0.3,
       };
+    }
+
+    const normalizedIntent =
+      typeof parsed.intent === "string" ? parsed.intent.trim() : "unknown";
+    const normalizedConfidence = Number(parsed.confidence);
+
+    if (!ALLOWED_INTENTS.has(normalizedIntent)) {
+      parsed.intent = "unknown";
+      parsed.confidence = 0;
+    } else if (!Number.isFinite(normalizedConfidence) || normalizedConfidence < MIN_CONFIDENCE) {
+      parsed.intent = "unknown";
+      parsed.confidence = Number.isFinite(normalizedConfidence)
+        ? normalizedConfidence
+        : 0;
+    } else {
+      parsed.intent = normalizedIntent;
+      parsed.confidence = Math.max(0, Math.min(1, normalizedConfidence));
     }
 
     return res.json(parsed);

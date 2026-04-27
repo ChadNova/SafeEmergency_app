@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
@@ -24,24 +24,29 @@ const copy = {
   questions: {
     Q1: {
       text: "Is the person conscious?",
-      description: "Can you talk to them and they respond, open their eyes, or move?",
-      voice: "Is the person conscious? Can they talk to you, open their eyes, or move?",
+      description:
+        "Can you talk to them and they respond, open their eyes, or move?",
+      voice:
+        "Is the person conscious? Can they talk to you, open their eyes, or move?",
     },
     Q2: {
       text: "Are they breathing normally?",
-      description: "Is their chest rising and falling regularly and without terrible struggle?",
+      description:
+        "Is their chest rising and falling regularly and without terrible struggle?",
       voice: "Are they breathing normally?",
     },
     Q3: {
       text: "Is there severe bleeding?",
-      description: "Is blood heavily pouring out or entirely soaking through their clothes?",
+      description:
+        "Is blood heavily pouring out or entirely soaking through their clothes?",
       voice: "Is there severe, heavy bleeding?",
     },
   },
   yes: "Yes",
   no: "No",
   replayQuestion: "Replay Question",
-  noThreatSpeech: "No immediate life-threatening emergency identified. Returning to general help."
+  noThreatSpeech:
+    "No immediate life-threatening emergency identified. Returning to general help.",
 };
 
 export default function TriageScreen() {
@@ -54,7 +59,7 @@ export default function TriageScreen() {
     if (!haptics) return;
     try {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch { }
+    } catch {}
   };
 
   const track = (event: string) => {
@@ -62,6 +67,14 @@ export default function TriageScreen() {
       console.info(`[analytics] ${event}`);
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        stop();
+      };
+    }, [stop]),
+  );
 
   useEffect(() => {
     // Auto-read the question when step changes
@@ -82,12 +95,14 @@ export default function TriageScreen() {
     } else if (step === "Q2") {
       if (answer === "NO") {
         // Navigate to Cardiac Arrest Protocol
+        stop();
         router.push({
           pathname: "/guidance",
           params: { protocolId: "cardiac_arrest" },
         });
       } else {
         // Navigate to Unconscious Protocol
+        stop();
         router.push({
           pathname: "/guidance",
           params: { protocolId: "unconscious" },
@@ -96,12 +111,14 @@ export default function TriageScreen() {
     } else if (step === "Q3") {
       if (answer === "YES") {
         // Navigate to Bleeding Protocol
+        stop();
         router.push({
           pathname: "/guidance",
           params: { protocolId: "bleeding" },
         });
       } else {
         // Future scope or general help
+        stop();
         speak(copy.noThreatSpeech);
         router.replace("/");
       }
@@ -115,7 +132,13 @@ export default function TriageScreen() {
     >
       {/* Header / Progress Bar */}
       <View className="flex-row items-center justify-between mt-4 mb-12">
-        <Pressable onPress={() => router.back()} className="p-2">
+        <Pressable
+          onPress={() => {
+            stop();
+            router.back();
+          }}
+          className="p-2"
+        >
           <Ionicons name="close" size={28} color={colors.textPrimary} />
         </Pressable>
         <View className="flex-row space-x-2">

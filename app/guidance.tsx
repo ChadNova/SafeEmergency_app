@@ -26,7 +26,7 @@ const copy = {
   supportActiveTitle: "Emergency support is active",
   completedProtocolMessage:
     "The guided protocol has finished. Use the actions below if you still need help or want to start over.",
-  call911: "Call 911",
+  callEmergency: "Call Rwandan Emergency",
   shareSos: "Share SOS",
   repeat: "Repeat",
   home: "Home",
@@ -153,12 +153,12 @@ export default function GuidanceScreen() {
     setIsFinished(true);
   };
 
-  const handleCall911 = React.useCallback(async () => {
+  const handleCallEmergency = React.useCallback(async () => {
     try {
-      await Linking.openURL("tel:911");
+      await Linking.openURL("tel:112");
     } catch {
       await Share.share({
-        message: "Emergency services: 911",
+        message: "Emergency services: 112",
       });
     }
   }, []);
@@ -250,10 +250,10 @@ export default function GuidanceScreen() {
             <View className="w-full space-y-4">
               <View className="mb-4 flex-row justify-between">
                 <ActionCard
-                  title={copy.call911}
+                  title={copy.callEmergency}
                   icon="call"
                   color="bg-rose-600"
-                  onPress={handleCall911}
+                  onPress={handleCallEmergency}
                 />
                 <ActionCard
                   title={copy.shareSos}
